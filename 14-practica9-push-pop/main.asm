@@ -3,73 +3,88 @@
 ; Horario: 9-10
 ; Docente: Dr. Jose Luis Medina Jimenez
 ; Practica: 09 - Push y Pop
-; Descripcion: mete numeros a la pila y los saca para ver el orden LIFO con call y ret
+; aqui vemos como funciona la pila con push pop y tambien call y ret
 
 INCLUDE Irvine32.inc
 
 .data
-msgMeter BYTE "Metiendo a la pila en orden 1 2 3 4 ...", 0
-msgSacar BYTE "Sacando de la pila (deberian salir al reves) ...", 0
 
 .code
-
-; ===================================================
-; procedimiento que mete los 4 valores a la pila
-; ===================================================
-MeterValores PROC
-    mov eax, 1
-    push eax             ; pila: [1]
-
-    mov eax, 2
-    push eax                ; pila: [1,2]
-
-    mov eax, 3
-    push eax                  ; pila: [1,2,3]
-
-    mov eax, 4
-    push eax                    ; pila: [1,2,3,4]  el 4 queda hasta arriba
-
-    ret                             ; regresa al lugar donde se llamo
-MeterValores ENDP
-
-
-; ===================================================
-; procedimiento que saca los 4 valores y los imprime
-; ===================================================
-SacarValores PROC
-    pop eax           ; saca el 4 que es el ultimo que entro osea LIFO
-    call WriteDec
-    call Crlf
-
-    pop eax              ; saca el 3
-    call WriteDec
-    call Crlf
-
-    pop eax                 ; saca el 2
-    call WriteDec
-    call Crlf
-
-    pop eax                    ; saca el 1 el primero que entro sale al final
-    call WriteDec
-    call Crlf
-
-    ret
-SacarValores ENDP
-
-
 main PROC
-    mov edx, OFFSET msgMeter
-    call WriteString
-    call Crlf
+	; bloque 1 push y pop basico
 
-    call MeterValores          ; aqui se meten los 4 numeros a la pila
+	mov eax, 500
 
-    mov edx, OFFSET msgSacar
-    call WriteString
-    call Crlf
+	push eax           ; metemos 500 a la pila
+	nop
 
-    call SacarValores             ; aqui se sacan en orden inverso 4 3 2 1
+	mov ebx, 0
+	pop ebx              ; sacamos de la pila y lo guardamos en ebx
 
-    exit
+	nop
+
+	; bloque 2 orden lifo
+	mov eax, 10
+	push eax             ; pila: 10
+
+	mov eax, 20
+	push eax               ; pila: 10 20
+
+	mov eax, 30
+	push eax                 ; pila: 10 20 30 (30 queda hasta arriba)
+
+	nop
+
+	pop eax           ; saca 30 el ultimo que entro
+	pop ebx              ; saca 20
+	pop ecx                ; saca 10
+	
+	nop
+
+	; bloque 3 conservar registros
+	; aqui guardamos eax y ebx antes de cambiarlos para no perder su valor
+
+	mov eax, 100
+	mov ebx, 200
+
+	push eax
+	push ebx
+
+	mov eax, 999
+	mov ebx, 888
+
+	pop ebx             ; ojo el orden es al reves del push
+	pop eax
+
+	nop
+
+	; bloque 4 call y ret
+	mov eax, 50
+	mov ebx, 666
+
+	call aumentarDiez       ; llamamos al procedimiento que le suma 10 a eax
+
+	nop
+
+	exit
+
 main ENDP
+
+aumentarDiez PROC
+	nop
+	push ebx             ; guardamos ebx antes de usarlo
+
+	nop
+
+	mov ebx, 10
+	add eax, ebx            ; aqui eax queda en 60
+
+	nop
+
+	pop ebx                  ; regresamos ebx a como estaba
+
+	nop
+
+	ret
+aumentarDiez ENDP
 END main
