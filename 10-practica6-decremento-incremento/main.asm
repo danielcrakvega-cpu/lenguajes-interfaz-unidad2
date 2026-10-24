@@ -18,7 +18,7 @@ pinCorrecto = 1234
 
 .code
 main PROC
-    mov ebx, 3          ; empezamos con 3 intentos disponibles
+    mov ebx, 3          ; empezamos con 3 intentos 
 
 inicio:
     mov edx, OFFSET msgPIN
