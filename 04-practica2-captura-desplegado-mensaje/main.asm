@@ -8,35 +8,35 @@
 INCLUDE Irvine32.inc
 
 .data
-mensajeEntrada     BYTE "Escribe tu nombre: ", 0
-nombre             BYTE 30 DUP(0)              ; buffer donde se va a guardar lo que escriba el usuario
-msgCaracteres      BYTE "Numero de caracteres escritos: ", 0
-msgSaludo          BYTE "Mucho gusto, ", 0
 
-.code
+mensajeEntrada BYTE "Escribe tu nombre: ", 0
+nombre BYTE 10 DUP(0)                       ; aqui se va a guardar lo que escriba el usuario
+caracteresEscritos BYTE "Numero de caracteres: ", 0
+experimento BYTE 50 DUP("a") ,"b",0          ; esto nomas para ver el tamaño de una cadena larga
+
+.code 
 main PROC
-    ; pedimos el nombre
-    mov edx, OFFSET mensajeEntrada
-    call WriteString
+	mov edx, OFFSET mensajeEntrada
+	call WriteString             ; pedimos el nombre
+	mov edx, OFFSET nombre
+	mov ecx, SIZEOF nombre       ; le decimos cuanto espacio tiene el buffer
 
-    mov edx, OFFSET nombre        ; edx apunta al buffer donde se va a guardar
-    mov ecx, SIZEOF nombre           ; ecx le dice a ReadString cuanto espacio tiene el buffer
-    call ReadString                     ; lee lo que escribe el usuario desde el teclado
+	call ReadString               ; lee lo que el usuario teclea
+	
+	mov edx, OFFSET nombre
+	call WriteString              ; mostramos el nombre que metio
+	call Crlf
 
-    ; ReadString regresa en eax cuantos caracteres se escribieron de verdad
-    mov edx, OFFSET msgCaracteres
-    call WriteString
-    call WriteDec               ; imprime el valor de eax osea los caracteres leidos
-    call Crlf
-    call Crlf
+	mov edx, OFFSET caracteresEscritos
+	call WriteString
+	call WriteDec                   ; eax trae cuantos caracteres leyo ReadString
+	call Crlf
+	mov edx, OFFSET	experimento
+	call WriteString
+	mov eax, SIZEOF experimento      ; probamos el tamaño del arreglo experimento
+	call Crlf
+	call WriteDec
 
-    ; mostramos el nombre que capturamos
-    mov edx, OFFSET msgSaludo
-    call WriteString
-    mov edx, OFFSET nombre
-    call WriteString
-    call Crlf
-
-    exit
+	exit
 main ENDP
 END main
