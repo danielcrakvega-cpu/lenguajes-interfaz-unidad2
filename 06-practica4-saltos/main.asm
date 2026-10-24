@@ -5,43 +5,54 @@
 ; Practica: 04 - Saltos
 ; Descripcion: ejemplo de salto incondicional jmp y de salto condicional je por igualdad
 
+; ejemplo 1 salto incondicional jmp
+
+INCLUDE Irvine32.inc
+
+.code 
+main PROC
+	mov eax, 5
+	jmp continuar       ; este jmp siempre salta sin revisar nada
+	mov eax, 10          ; no se va ejecutar por el jmp de arriba
+	
+
+continuar:
+	call DumpRegs           ;  eax es  5
+	exit
+
+main ENDP
+END main
+
+
+
+; ejemplo 2 salto condicional por igualdad je
+
 INCLUDE Irvine32.inc
 
 .data
-msgIguales    BYTE "Los valores son iguales", 0
-msgDiferentes BYTE "Los valores son diferentes", 0
+	msgIguales BYTE "Los valores son iguales", 0
+	msgDiferentes BYTE "Los valores son diferentes", 0
 
-.code
+.code 
 main PROC
-    ; ---------------------------------
-    ; parte 1 salto incondicional JMP
-    ; ---------------------------------
-    mov eax, 5
-    jmp continuar          ; jmp siempre salta sin revisar nada
-    mov eax, 10             ; esta linea nunca se ejecuta por el jmp de arriba
+	mov eax, 4
+	mov ebx, 2
+	
+	cmp eax, ebx            ; aqui se prende el zero flag si son iguales
 
-continuar:
-    call DumpRegs              ; aqui eax todavia vale 5
-
-    ; ---------------------------------
-    ; parte 2 salto condicional por igualdad
-    ; ---------------------------------
-    mov eax, 4
-    mov ebx, 2
-
-    cmp eax, ebx          ; compara eax contra ebx se enciende la zero flag si son iguales
-
-    je iguales                ; si eax es igual a ebx salta a iguales
-    mov edx, OFFSET msgDiferentes
-    call WriteString
-    jmp fin
+	je iguales                 ; si zero flag esta en 1 brinca a iguales
+	mov edx, OFFSET msgDiferentes
+	call WriteString
+	
+	jmp fin
 
 iguales:
-    mov edx, OFFSET msgIguales
-    call WriteString
+	mov edx, OFFSET msgIguales
+	call WriteString 
+	jmp fin
 
 fin:
-    call Crlf
-    exit
+	call Crlf
+	exit
 main ENDP
 END main
