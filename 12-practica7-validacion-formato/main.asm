@@ -16,7 +16,7 @@ msgValido   BYTE "SU CADENA ES VALIDA", 0
 .code
 main PROC
 ciclar:
-    mov ESI, 0                   ; esi va a ser el indice de cada caracter de la cadena
+    mov ESI, 0                     ; esi es el indice que recorre la cadena
     mov edx, OFFSET msgInicial
     call WriteString
     call Crlf
