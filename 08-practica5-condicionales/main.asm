@@ -3,55 +3,40 @@
 ; Horario: 9-10
 ; Docente: Dr. Jose Luis Medina Jimenez
 ; Practica: 05 - Condicionales
-; Descripcion: pide una calificacion y dice si es reprobado regular o buena usando if y else
+; dos contadores que van subiendo hasta llegar a un limite muy grande
 
 INCLUDE Irvine32.inc
-
-.data
-msgPedir    BYTE "Ingresa tu calificacion de 0 a 10: ", 0
-msgRepro    BYTE "Estas reprobado", 0
-msgRegular  BYTE "Vas regular todavia puedes subir", 0
-msgBuena    BYTE "Vas muy bien sigue asi", 0
-
-calif DWORD ?
-
-.code
+.code 
 main PROC
-    mov edx, OFFSET msgPedir
-    call WriteString
-    call ReadInt            ; el numero que escribe el usuario llega en eax
-    mov calif, eax
-    call Crlf
 
-    mov eax, calif
+	mov ebx, 1
+    
 
-    ; primer if calificacion menor a 6 es reprobado
-    cmp eax, 6
-    jl esReprobado
+ciclo:
 
-    ; segundo if calificacion entre 6 y 8 es regular
-    cmp eax, 8
-    jle esRegular
+	cmp eax, 999999999       ; mientras eax no llegue a este numero sigue
 
-    ; si no cayo en ninguno de los anteriores entonces es buena
-    jmp esBuena
+	jg ciclo2
+;	call WriteDec
+;	call Crlf
 
-esReprobado:
-    mov edx, OFFSET msgRepro
-    call WriteString
-    jmp finPrograma
+	inc eax                    ; le sumamos 1 a eax en cada vuelta
 
-esRegular:
-    mov edx, OFFSET msgRegular
-    call WriteString
-    jmp finPrograma
+	jmp ciclo
+	
+ciclo2:
+	mov eax, ebx
+	call WriteDec              ; mostramos el valor de ebx
+	call Crlf
+	mov eax, 1
+	cmp ebx, 999999999
+	jg fin
+	inc ebx                       ; le sumamos 1 a ebx
+	jmp ciclo
 
-esBuena:
-    mov edx, OFFSET msgBuena
-    call WriteString
+fin:
 
-finPrograma:
-    call Crlf
-    exit
+	exit
+
 main ENDP
 END main
