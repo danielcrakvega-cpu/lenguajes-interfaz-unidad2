@@ -5,6 +5,9 @@
 ; Practica: 01 - Hola mundo sin Irvine32
 ; Descripcion: hola mundo usando solo la api de windows sin usar la libreria irvine32
 
+; practica hola mundo sin usar la libreria Irvine32
+; aqui usamos funciones de windows directo (kernel32)
+
 .386
 .model flat, stdcall
 option casemap:none
@@ -12,30 +15,28 @@ option casemap:none
 include \masm32\include\kernel32.inc
 includelib \masm32\lib\kernel32.lib
 
-; aqui declaro las funciones de windows que voy a usar
-; esto es como un prototipo para que el ensamblador sepa que parametros reciben
+; declaramos las funciones de windows que vamos a usar
 GetStdHandle  PROTO, nStdHandle:DWORD
 WriteConsoleA PROTO, hConsoleOutput:DWORD, lpBuffer:PTR BYTE, nNumberOfCharsToWrite:DWORD, lpNumberOfCharsWritten:PTR DWORD, lpReserved:DWORD
 ExitProcess   PROTO, uExitCode:DWORD
 
-STD_OUTPUT_HANDLE equ -11      ; constante que pide windows para la salida estandar osea la consola
+STD_OUTPUT_HANDLE equ -11
 
 .data
-mensaje       BYTE "Hola, Mundo!", 0    ; el texto que voy a mostrar
-handleConsola DWORD ?                      ; aqui se guarda el handle que me regresa windows
-bytesEscritos DWORD ?                         ; windows necesita un lugar donde anotar cuantos bytes escribio
+mensaje       BYTE "Hola Mundo!", 0
+handleConsola DWORD ?
+bytesEscritos DWORD ?
 
 .code
 main PROC
-    ; pido a windows el handle de la consola para poder escribir en ella
+    ; pedimos el handle de la consola a windows
     INVOKE GetStdHandle, STD_OUTPUT_HANDLE
     mov handleConsola, eax
 
-    ; escribo el mensaje directo en la consola usando WriteConsoleA
-    ; SIZEOF mensaje - 1 es para no mandar el byte 0 final osea el terminador
+    ; escribimos el mensaje directo en consola sin usar WriteString
     INVOKE WriteConsoleA, handleConsola, ADDR mensaje, SIZEOF mensaje - 1, ADDR bytesEscritos, 0
 
-    ; cierro el programa de forma correcta
+    ; cerramos el programa
     INVOKE ExitProcess, 0
 main ENDP
 END main
