@@ -16,6 +16,6 @@ main PROC
     call WriteString              ; esta funcion de irvine imprime lo que apunta edx
     call Crlf                        ; salto de linea
 
-    exit                                 ; termina el programa de forma correcta
+    exit                                 ; termina el programa 
 main ENDP
 END main
