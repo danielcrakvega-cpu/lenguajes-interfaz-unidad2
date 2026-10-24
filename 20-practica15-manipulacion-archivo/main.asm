@@ -7,53 +7,55 @@
 
 INCLUDE Irvine32.inc
 
+INVALID_HANDLE_VALUE EQU -1
+
 .data
-nombreArchivo  BYTE "miarchivo.txt", 0
-texto          BYTE "Hola este es un archivo de prueba", 0
-buffer         BYTE 100 DUP(0)     ; aqui se va a guardar lo que leamos del archivo
+    nombreArchivo   BYTE "inventario.txt", 0
+    texto           BYTE "125", 0
+    archivoHandle   HANDLE ?
+    mensajeExito    BYTE "Archivo Guardado", 0
+    mensajeError    BYTE "No se pudo guardar el archivo", 0
 
 .code
 main PROC
-
-    ; creamos el archivo osea si ya existia lo sobreescribe
+    ; aqui creamos el archivo con el nombre que pusimos arriba
     mov edx, OFFSET nombreArchivo
-    call CreateOutputFile       ; esto regresa el handle en eax
-    mov ebx, eax                   ; guardamos el handle en ebx para no perderlo
+    call CreateOutputFile
+    cmp eax, INVALID_HANDLE_VALUE   ; revisamos si el handle salio mal
+    je  Error                 
+    mov archivoHandle, eax    ; si todo bien guardamos el handle en la variable
 
-    ; escribimos el texto adentro del archivo
-    mov eax, ebx
+    ; ahora escribimos el texto dentro del archivo
+    mov eax, archivoHandle
     mov edx, OFFSET texto
-    mov ecx, SIZEOF texto - 1
+    mov ecx, SIZEOF texto - 1   ; el -1 es pa no contar el cero del final
     call WriteToFile
+    
+    jc  errorEscritura         ; si el CF se prendio algo fallo al escribir
+    cmp eax, SIZEOF texto - 1   ; aqui checamos que si escribio todos los bytes
+    jne errorEscritura          ; si no escribio lo mismo que pedimos hay error
 
-    ; cerramos el archivo siempre hay que cerrar despues de escribir
-    mov eax, ebx
+    ; cerramos el archivo pa que guarde bien los cambios
+    mov eax, archivoHandle
     call CloseFile
+    test eax, eax   ; si CloseFile regresa 0 es que fallo el cierre
+    je  Error                 
 
-    ; ahora lo abrimos de nuevo pero para leerlo
-    mov edx, OFFSET nombreArchivo
-    call OpenInputFile          ; tambien regresa el handle en eax
-    mov ebx, eax
-
-    ; leemos el contenido hacia el buffer
-    mov eax, ebx
-    mov edx, OFFSET buffer
-    mov ecx, SIZEOF buffer - 1
-    call ReadFromFile               ; eax regresa cuantos bytes se leyeron de verdad
-
-    mov edi, OFFSET buffer         ; le ponemos el terminador nulo justo despues de lo leido
-    add edi, eax
-    mov BYTE PTR [edi], 0
-
-    ; mostramos lo que leimos
-    mov edx, OFFSET buffer
+    ; si llegamos hasta aca ya todo salio bien
+    mov edx, OFFSET mensajeExito
     call WriteString
-    call Crlf
+    jmp fin
 
-    ; cerramos el archivo al terminar
-    mov eax, ebx
-    call CloseFile
+errorEscritura:
+    mov eax, archivoHandle
+    call CloseFile              ; cerramos el archivo aunque haya fallado arriba
 
-    exit
+Error:
+    mov edx, OFFSET mensajeError   ; mostramos el mensaje de error
+    call WriteString
+
+fin:
+    exit   ; aqui se termina el programa
 main ENDP
+
 END main
