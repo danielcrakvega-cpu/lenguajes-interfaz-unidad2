@@ -23,58 +23,55 @@ main PROC
 PedirDatos:
     mov edx, OFFSET promptMsg
     call WriteString
-
+    
     mov edx, OFFSET buffer
     mov ecx, SIZEOF buffer
     call ReadString
-
-    ; eax trae cuantos caracteres leyo ReadString
+    
+    ; eax trae cuantos caracteres leyo readstring
     cmp eax, 0
     je ErrorEntrada
     cmp eax, 2
-    ja ErrorEntrada             ; no dejamos meter mas de 2 digitos
+    ja ErrorEntrada             ; si metio mas de 2 digitos es invalido
 
     mov esi, OFFSET buffer
-    mov ecx, eax                ; usamos exactamente los caracteres que se leyeron
-
+    mov ecx, eax            ; usamos exactamente la cantidad de caracteres leidos
 ValidarCaracteres:
     mov al, [esi]
-    cmp al, '0'                ; checamos que cada caracter sea un digito valido del 0 al 9
+    cmp al, '0'
     jb ErrorEntrada
     cmp al, '9'
-    ja ErrorEntrada
+    ja ErrorEntrada               ; checamos que cada caracter sea un digito
     inc esi
     loop ValidarCaracteres
 
-    ; ahora convertimos el texto que escribio el usuario a un numero de verdad
     mov esi, OFFSET buffer
     mov eax, 0
     mov ebx, 10
-    mov ecx, 2                    ; maximo 2 digitos
-
+    mov ecx, 2              ; maximo 2 digitos
 ConvertLoop:
     movzx edx, BYTE PTR [esi]
     cmp dl, 0
     je FinConversion
-    cmp dl, 0Dh                      ; por si queda algun retorno de carro
+    cmp dl, 0Dh             ; ignoramos retorno de carro
     je FinConversion
-    cmp dl, 0Ah                         ; por si queda un salto de linea
+    cmp dl, 0Ah             ; ignoramos salto de linea
     je FinConversion
-    sub dl, '0'                            ; quitamos el 48 para dejar el valor numerico real
-    mul ebx                                   ; recorremos una posicion decimal
+    sub dl, '0'
+    mul ebx
     add eax, edx
     inc esi
     loop ConvertLoop
 
 FinConversion:
-    cmp eax, 1                  ; validamos que la cantidad este en el rango permitido
+    cmp eax, 1
     jb ErrorEntrada
     cmp eax, 99
-    ja ErrorEntrada
+    ja ErrorEntrada                ; el numero tiene que estar entre 1 y 99
 
     mov cantidadRecibida, eax
     mov ebx, existenciaInicial
-    add eax, ebx
+    add eax, ebx                      ; sumamos lo recibido a la existencia inicial
     mov existenciaActual, eax
 
     mov edx, OFFSET msgExistencia
@@ -82,7 +79,7 @@ FinConversion:
 
     mov eax, existenciaActual
     mov edi, OFFSET outBuffer
-    call ConvDwordToString          ; convertimos el resultado de vuelta a texto para mostrarlo
+    call ConvDwordToString               ; convertimos el resultado a texto
 
     mov edx, OFFSET outBuffer
     call WriteString
@@ -94,38 +91,32 @@ ErrorEntrada:
     mov edx, OFFSET errorMsg
     call WriteString
     call Crlf
-    jmp PedirDatos               ; si hubo error se vuelve a pedir el dato
+    jmp PedirDatos                          ; si hubo error volvemos a pedir el dato
 
 FinProg:
     exit
 main ENDP
 
-; ===================================================
-; convierte el numero que trae eax a texto decimal
-; entra: eax = numero   edi = donde se va a escribir el texto
-; ===================================================
+; convierte un dword a su texto decimal
 ConvDwordToString PROC
-    pushad                   ; esto guarda todos los registros generales de un jalon
-
+    pushad                     ; guarda todos los registros de un jalon
     mov ecx, 0
     mov ebx, 10
 DivLoop:
     mov edx, 0
     div ebx
     add dl, '0'
-    push edx
+    push edx                      ; metemos cada digito a la pila
     inc ecx
     cmp eax, 0
     jne DivLoop
-
 PopLoop:
-    pop edx
+    pop edx                         ; sacamos en orden correcto por el lifo
     mov [edi], dl
     inc edi
     loop PopLoop
-
     mov BYTE PTR [edi], 0
-    popad                        ; restauramos todos los registros en el orden inverso
+    popad                              ; regresa todos los registros
     ret
 ConvDwordToString ENDP
 
