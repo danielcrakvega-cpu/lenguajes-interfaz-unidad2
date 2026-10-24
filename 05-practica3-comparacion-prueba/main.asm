@@ -27,7 +27,7 @@ main PROC
     mov ebx, 0
     mov al, 5
     mov bl, 10
-    cmp al, bl               ; al es menor que bl entonces se activa el carry flag
+    cmp al, bl               ; al es menor que bl entonces se  activa el cary flag
     call DumpRegs
 
     ; caso 4 overflow con signo
@@ -35,19 +35,19 @@ main PROC
     mov ebx, 0
     mov al, -128
     mov bl, 1
-    cmp al, bl                  ; aqui se desborda el rango de un byte con signo
+    cmp al, bl                  ; a qui se desborda el rango de un byte con signo
     call DumpRegs
 
     ; caso 5 test
-    ; test hace un and por dentro pero no guarda el resultado solo mueve las banderas
+    ; test hace un and por dentro pero no guarda el resultado solo mueve las  banderas
     mov eax, 5
-    test eax, 1                   ; sirve para saber si un numero es par o impar
+    test eax, 1                   ; sirve para  saber si un numero es par o impar
     call DumpRegs
 
     ; 00000101   <- el 5
     ; 00000001   <- el 1
     ; --------
-    ; 00000001   <- como no da puro cero la zero flag queda en 0 osea 5 es impar
+    ; 00000001   <- como no da puro cero la zero flag queda en 0 osea 5 es  impar
 
     exit
 main ENDP
